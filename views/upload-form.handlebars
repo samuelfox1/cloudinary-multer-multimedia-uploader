@@ -1,0 +1,17 @@
+<form>
+  {{> file-input}}
+  <section class="columns">
+    <div class="column">
+      <h6 class="is-size-7">preview content</h6>
+      {{> media-item}}
+    </div>
+    <div class="column is-one-half ">
+      <label class="is-size-7" for="my-description">file description</label>
+      <div>
+        <textarea class="textarea is-link" name="my-description" placeholder="optional" rows="3"></textarea>
+        {{> password-input}}
+        <button type="submit" class="button is-link is-fullwidth" disabled>Submit</button>
+      </div>
+    </div>
+  </section>
+</form>
