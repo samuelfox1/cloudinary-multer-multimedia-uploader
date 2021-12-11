@@ -1,5 +1,5 @@
 {
-  "name": "cloudinary-multer-multimedia-uploader",
+  "name": "sjf-file-uploader",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
