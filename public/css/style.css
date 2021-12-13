@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
 header{
     min-height: 5vh;
 }
 main {
     min-height: 70vh;
-=======
-header {
-    height: 5vh;
-}
-main {
-    min-height: 65vh;
->>>>>>> Stashed changes
 }
 
 #image-preview, #video-preview {
@@ -31,16 +23,6 @@ input, img {
     min-height: 94%;
 }
 
-<<<<<<< Updated upstream
 a i {
     font-size: 3em;
-=======
-.heroku-icon{
-    content: url('../assets/heroku-logo-solid-purple.png');
-    max-width: 125px;
-}
-
-a i {
-    font-size: 5em;
->>>>>>> Stashed changes
 }
