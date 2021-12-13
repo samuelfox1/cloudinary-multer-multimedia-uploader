@@ -1,6 +1,6 @@
 # sjf-file-uploader
 
-- [sjf-file-uploader.herokuapp.com](https://sjf-file-uploader.herokuapp.com/)
+[sjf-file-uploader.herokuapp.com](https://sjf-file-uploader.herokuapp.com/)
 
 1. select image to upload
 2. click upload
