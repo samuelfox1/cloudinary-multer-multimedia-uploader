@@ -6,4 +6,4 @@
 
 checkout my  [cloudinary-sandbox](https://github.com/samuelfox1/cloudinary-sandbox) for a basic image uploader
 
-- [thawing-temple-19900.herokuapp.com](https://thawing-temple-19900.herokuapp.com/)
+- [sjf-file-uploader.herokuapp.com](https://sjf-file-uploader.herokuapp.com/)

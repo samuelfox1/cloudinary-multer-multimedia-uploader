@@ -1,5 +1,6 @@
 window.addEventListener('load', function () {
     const formEl = document.querySelector('form')
+    const fileInputComponent = document.getElementById('file-input-component')
     const fileInputEl = document.querySelector('input[name="my-file"]');
     const fileInputLabel = document.getElementById('file-name');
     const descriptionInputEl = document.querySelector('textarea[name="my-description"]');
@@ -11,14 +12,12 @@ window.addEventListener('load', function () {
      * of the file will have the value
      * '<type>/<file-extention>'
      * 
-     * ex: 
-     *      'image/png', 'audio/mp3', 'video/mp4'
+     * ex: 'image/png', 'audio/mp3', 'video/mp4'
      * ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
-     * using the keys 'audio', 'image', 'video'
-     * by grabbing the mimetype text before the slash
-     * the correct DOM node can be targeted.
-     * ex:
-     *      mediaType['image'] (target the image element)
+     * by using the object keys 'audio', 'image', 'video'
+     * we can easily access a property with the type text
+     * 
+     * ex: mediaType['image'] (targets the image element)
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const mediaType = {
         audio: document.getElementById('audio-preview'),
@@ -37,12 +36,24 @@ window.addEventListener('load', function () {
         return formData
     }
     const validateForm = (file, password) => {
-        if (file && password) {
-            submitBtn.removeAttribute('disabled');
-            return true
+        if (!file) {
+            fileInputComponent.classList.add('is-danger')
+            submitBtn.setAttribute('disabled', true);
+            return false
         }
-        submitBtn.setAttribute('disabled', true);
-        return false
+        if (!password) {
+            submitBtn.setAttribute('disabled', true);
+            submitBtn.classList.add('is-danger')
+            submitBtn.removeAttribute('disabled');
+            return false
+        }
+        fileInputComponent.classList.remove('is-danger')
+        fileInputComponent.classList.add('is-success')
+
+        submitBtn.classList.remove('is-danger')
+        submitBtn.classList.add('is-success')
+
+        return true
     }
     const toggleLoading = () => submitBtn.classList.toggle('is-loading')
     const loadResults = (type, url) => {
@@ -69,55 +80,60 @@ window.addEventListener('load', function () {
         });
     };
 
-    passwordInputEl.addEventListener('input', (e) => {
-        if (!validateForm(myFile, e.target.value)) return
-        console.log('active')
+    passwordInputEl.addEventListener('input', ({ target }) => {
+        if (!validateForm(myFile, target.value)) return
     })
+    fileInputEl.addEventListener('change', ({ target }) => {
+        if (!target.files || !target.files[0]) return
+        myFile = target.files[0];
+        // console.log(myFile);
+        displaySelectedFileName(myFile.name);
 
-    formEl.addEventListener('submit', (e) => {
-        e.preventDefault()
-        if (!validateForm(myFile, passwordInputEl.value)) return
-        toggleLoading()
-        const formData = collectFormData(myFile)
-
-        fetch('/api/upload', {
-            method: 'POST',
-            headers: {
-                'Authorization': `bearer ${passwordInputEl.value}`
-            },
-            body: formData
-        })
-            // resetPage()
-            .then(res => res.json())
-            .then((body) => {
-                console.log(body);
-                resetPage()
-                const { mimetype, url } = body;
-                loadResults(mimetype.split('/')[0], url);
-                toggleLoading();
-            })
-            .catch(err => {
-                console.error(err);
-                toggleLoading();
-            });
-    })
-
-    fileInputEl.addEventListener('change', function ({ target }) {
-        if (target.files && target.files[0]) {
-            myFile = target.files[0];
-            console.log(myFile);
-            displaySelectedFileName(myFile.name);
-
-            const type = myFile.type.split('/')[0];
-            resetMediaElements();
-            mediaType[type].src = URL.createObjectURL(myFile); // set element src to blob url
-            mediaType[type].setAttribute('controls', null);
-            type === 'video' && mediaType[type].setAttribute('type', myFile.type);
-            displayMediaContent(mediaType[type]);
-        };
+        const type = myFile.type.split('/')[0];
+        resetMediaElements();
+        mediaType[type].src = URL.createObjectURL(myFile); // set element src to blob url
+        mediaType[type].setAttribute('controls', null);
+        type === 'video' && mediaType[type].setAttribute('type', myFile.type);
+        displayMediaContent(mediaType[type]);
 
         const reader = new FileReader();
         reader.readAsDataURL(myFile);
         reader.onloadend = () => validateForm(myFile, passwordInputEl.value)
     });
+
+
+    formEl.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        if (!validateForm(myFile, passwordInputEl.value)) return
+        toggleLoading()
+        const formData = collectFormData(myFile)
+
+        try {
+            const data = await fetch('/api/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `bearer ${passwordInputEl.value}`
+                },
+                body: formData
+            }).then(res => res.status === 200 ? res.json() : null)
+            // console.log(data)
+            if (!data) {
+                // handle unauathorized
+                resetPage();
+                toggleLoading()
+                hostedLinkEl.innerText = `something went wrong, please try again`;
+
+                return console.log('unauthorized')
+            }
+            resetPage()
+            const { mimetype, url } = data;
+            loadResults(mimetype.split('/')[0], url);
+            toggleLoading();
+
+        } catch (error) {
+            console.error(error);
+            toggleLoading();
+        }
+    })
+
 });

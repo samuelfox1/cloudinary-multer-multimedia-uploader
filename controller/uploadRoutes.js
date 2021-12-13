@@ -30,7 +30,7 @@ router.post('/upload', auth, upload.single('myFile'), async ({ body, file }, res
             .upload(pathToFile, {
                 // mime type starts with 'image' || 'video'|| 'auido'
                 resource_type: mimetype.split('/')[0] === 'image' ? 'image' : 'video',
-                public_id: 'cloudinary-sandbox-demo', // folder name to store in cloudinary 
+                public_id: `sjf-file-uploader/${filename}`, // folder/file name to store in cloudinary 
             },
                 (error) => {
                     if (error) console.error(error)
@@ -52,7 +52,7 @@ router.post('/upload', auth, upload.single('myFile'), async ({ body, file }, res
         });
     } catch (error) {
         console.error(error);
-        res.json({ msg: 'failure' });
+        res.status(500).json({ msg: 'failure' });
     }
 });
 

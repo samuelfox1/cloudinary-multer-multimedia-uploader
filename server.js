@@ -1,16 +1,15 @@
 const express = require('express');
-const exphbs = require('express-handlebars');
+const { engine } = require('express-handlebars').create({});
 const morgan = require('morgan')
 const path = require('path');
-const hbs = exphbs.create({});
+const controller = require('./controller')
 
-const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.engine('handlebars', hbs.engine);
+const app = express();
+app.engine('handlebars', engine);
 app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', controller)
 app.use(morgan('dev')) // log traffic activity to console
-app.use('/', require('./controller'))
-
 app.listen(PORT, () => console.log('Server listening on: http://localhost:' + PORT));
